@@ -7,6 +7,8 @@ build
 checkstyle*.xml
 configuration.yml
 target/
+cache/ignite/
+/ignite
 
 .classpath
 .settings/

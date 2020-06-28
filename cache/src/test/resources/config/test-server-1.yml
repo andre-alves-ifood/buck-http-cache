@@ -29,7 +29,6 @@ storeProviderConfig:
     expirationTimeUnit: DAYS
     expirationTimeValue: 7
     atomicSequenceReserveSize: 10000
-    offHeapStorageSize: 40g # 40GB
 
 statsd:
   enabled: false

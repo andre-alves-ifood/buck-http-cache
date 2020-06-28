@@ -8,8 +8,8 @@ import javax.annotation.Nonnull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.ignite.cache.CacheMemoryMode;
 import org.apache.ignite.cache.CacheMode;
+import org.jetbrains.annotations.NotNull;
 
 public class IgniteConfig {
 
@@ -28,13 +28,9 @@ public class IgniteConfig {
   @Nonnull
   private final Integer atomicSequenceReserveSize;
   @Nonnull
-  private final String offHeapStorageSize;
-  @Nonnull
   private final List<String> hostIPs;
   @Nonnull
   private final String dnsLookupAddress;
-  @Nonnull
-  private final CacheMemoryMode cacheMemoryMode;
 
   @JsonCreator
   public IgniteConfig(
@@ -45,10 +41,8 @@ public class IgniteConfig {
       @Nonnull @JsonProperty("expirationTimeUnit") TimeUnit expirationTimeUnit,
       @Nonnull @JsonProperty("expirationTimeValue") Long expirationTimeValue,
       @Nonnull @JsonProperty("atomicSequenceReserveSize") Integer atomicSequenceReserveSize,
-      @Nonnull @JsonProperty("offHeapStorageSize") String offHeapStorageSize,
       @Nonnull @JsonProperty("hostIPs") List<String> hostIPs,
-      @Nonnull @JsonProperty("dnsLookupAddress") String dnsLookupAddress,
-      @Nonnull @JsonProperty("cacheMemoryMode") CacheMemoryMode cacheMemoryMode) {
+      @Nonnull @JsonProperty("dnsLookupAddress") String dnsLookupAddress) {
     this.multicastIP = multicastIP;
     this.multicastPort = multicastPort;
     this.cacheMode = cacheMode;
@@ -56,55 +50,55 @@ public class IgniteConfig {
     this.expirationTimeUnit = expirationTimeUnit;
     this.expirationTimeValue = expirationTimeValue;
     this.atomicSequenceReserveSize = atomicSequenceReserveSize;
-    this.offHeapStorageSize = offHeapStorageSize;
     this.hostIPs = hostIPs;
     this.dnsLookupAddress = dnsLookupAddress;
-    this.cacheMemoryMode = cacheMemoryMode;
   }
 
+  @NotNull
   public List<String> getHostIPs() {
     return hostIPs;
   }
 
-  public String getOffHeapStorageSize() {
-    return offHeapStorageSize;
-  }
-
+  @NotNull
   public String getMulticastIP() {
     return multicastIP;
   }
 
+  @NotNull
   public Integer getMulticastPort() {
     return multicastPort;
   }
 
+  @NotNull
   public CacheMode getCacheMode() {
     return cacheMode;
   }
 
+  @NotNull
   public Integer getCacheBackupCount() {
     return cacheBackupCount;
   }
 
+  @NotNull
   public TimeUnit getExpirationTimeUnit() {
     return expirationTimeUnit;
   }
 
+  @NotNull
   public Long getExpirationTimeValue() {
     return expirationTimeValue;
   }
 
+  @NotNull
   public Integer getAtomicSequenceReserveSize() {
     return atomicSequenceReserveSize;
   }
 
-  public CacheMemoryMode getCacheMemoryMode() {
-    return cacheMemoryMode;
-  }
-
+  @NotNull
   public String getDnsLookupAddress() {
     return dnsLookupAddress;
   }
+
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
   }
