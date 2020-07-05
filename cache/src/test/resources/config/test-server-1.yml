@@ -29,6 +29,10 @@ storeProviderConfig:
     expirationTimeUnit: DAYS
     expirationTimeValue: 7
     atomicSequenceReserveSize: 10000
+    workDirectory:
+    persistenceEnabled: false
+    persistenceStoragePath:
+    maxMemorySize:
 
 statsd:
   enabled: false

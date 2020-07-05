@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,6 +32,14 @@ public class IgniteConfig {
   private final List<String> hostIPs;
   @Nonnull
   private final String dnsLookupAddress;
+  @Nullable
+  private final String workDirectory;
+  @Nonnull
+  private final Boolean persistenceEnabled;
+  @Nullable
+  private final String persistenceStoragePath;
+  @Nullable
+  private final Long maxMemorySize;
 
   @JsonCreator
   public IgniteConfig(
@@ -42,7 +51,11 @@ public class IgniteConfig {
       @Nonnull @JsonProperty("expirationTimeValue") Long expirationTimeValue,
       @Nonnull @JsonProperty("atomicSequenceReserveSize") Integer atomicSequenceReserveSize,
       @Nonnull @JsonProperty("hostIPs") List<String> hostIPs,
-      @Nonnull @JsonProperty("dnsLookupAddress") String dnsLookupAddress) {
+      @Nonnull @JsonProperty("dnsLookupAddress") String dnsLookupAddress,
+      @Nullable @JsonProperty("workDirectory") String workDirectory,
+      @Nonnull @JsonProperty("persistenceEnabled") Boolean persistenceEnabled,
+      @Nullable @JsonProperty("persistenceStoragePath") String persistenceStoragePath,
+      @Nullable @JsonProperty("maxMemorySize") Long maxMemorySize) {
     this.multicastIP = multicastIP;
     this.multicastPort = multicastPort;
     this.cacheMode = cacheMode;
@@ -52,6 +65,10 @@ public class IgniteConfig {
     this.atomicSequenceReserveSize = atomicSequenceReserveSize;
     this.hostIPs = hostIPs;
     this.dnsLookupAddress = dnsLookupAddress;
+    this.workDirectory = workDirectory;
+    this.persistenceEnabled = persistenceEnabled;
+    this.persistenceStoragePath = persistenceStoragePath;
+    this.maxMemorySize = maxMemorySize;
   }
 
   @NotNull
@@ -97,6 +114,26 @@ public class IgniteConfig {
   @NotNull
   public String getDnsLookupAddress() {
     return dnsLookupAddress;
+  }
+
+  @Nullable
+  public String getWorkDirectory() {
+    return workDirectory;
+  }
+
+  @NotNull
+  public Boolean getPersistenceEnabled() {
+    return persistenceEnabled;
+  }
+
+  @Nullable
+  public String getPersistenceStoragePath() {
+    return persistenceStoragePath;
+  }
+
+  @Nullable
+  public Long getMaxMemorySize() {
+    return maxMemorySize;
   }
 
   public String toString() {

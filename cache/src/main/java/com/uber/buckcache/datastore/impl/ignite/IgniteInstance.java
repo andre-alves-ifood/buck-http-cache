@@ -16,10 +16,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.cache.expiry.ExpiryPolicy;
-import org.apache.ignite.Ignite;
-import org.apache.ignite.IgniteAtomicSequence;
-import org.apache.ignite.IgniteCache;
-import org.apache.ignite.Ignition;
+
+import org.apache.ignite.*;
 import org.apache.ignite.cluster.ClusterMetrics;
 import org.apache.ignite.cluster.ClusterNode;
 import org.apache.ignite.configuration.IgniteConfiguration;
@@ -47,16 +45,41 @@ public class IgniteInstance {
   public IgniteInstance(CacheInstanceMode mode, IgniteConfig config) {
     this.config = config;
     this.igniteConfiguration = new IgniteConfigurationBuilder()
-        .addMulticastBasedDiscrovery(this.config.getMulticastIP(), this.config.getMulticastPort(),
-            this.config.getHostIPs(), this.config.getDnsLookupAddress())
-        .addCacheConfiguration(this.config.getCacheMode(), this.config.getCacheBackupCount(),
-            this.config.getExpirationTimeUnit(), this.config.getExpirationTimeValue(),
-            KEYS_CACHE_NAME, KEYS_REVERSE_CACHE_NAME, METADATA_CACHE_NAME)
-        .addAtomicSequenceConfig(config.getAtomicSequenceReserveSize()).build();
+            .setWorkDirectory(
+                    this.config.getWorkDirectory()
+            )
+            .addMulticastBasedDiscrovery(
+                    this.config.getMulticastIP(),
+                    this.config.getMulticastPort(),
+                    this.config.getHostIPs(),
+                    this.config.getDnsLookupAddress()
+            )
+            .addCacheConfiguration(
+                    this.config.getCacheMode(),
+                    this.config.getCacheBackupCount(),
+                    this.config.getExpirationTimeUnit(),
+                    this.config.getExpirationTimeValue(),
+                    KEYS_CACHE_NAME,
+                    KEYS_REVERSE_CACHE_NAME,
+                    METADATA_CACHE_NAME
+            )
+            .addAtomicSequenceConfig(
+                    config.getAtomicSequenceReserveSize()
+            )
+            .addDataStorageConfiguration(
+                    this.config.getPersistenceEnabled(),
+                    this.config.getPersistenceStoragePath(),
+                    this.config.getMaxMemorySize()
+            )
+            .build();
 
     logger.info("isClientMode : {}", mode == CacheInstanceMode.CLIENT);
     Ignition.setClientMode(mode == CacheInstanceMode.CLIENT);
     ignite = Ignition.start(igniteConfiguration);
+
+    if (this.config.getPersistenceEnabled()) {
+      ignite.cluster().active(true);
+    }
 
     cacheKeys = ignite.cluster().ignite().getOrCreateCache(KEYS_CACHE_NAME);
     reverseCacheKeys = ignite.cluster().ignite().getOrCreateCache(KEYS_REVERSE_CACHE_NAME);

@@ -9,9 +9,7 @@ import javax.cache.expiry.TouchedExpiryPolicy;
 
 import com.spotify.dns.DnsSrvResolvers;
 import org.apache.ignite.cache.CacheMode;
-import org.apache.ignite.configuration.AtomicConfiguration;
-import org.apache.ignite.configuration.CacheConfiguration;
-import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.configuration.*;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
@@ -85,6 +83,37 @@ public class IgniteConfigurationBuilder {
     AtomicConfiguration atomicCfg = new AtomicConfiguration();
     atomicCfg.setAtomicSequenceReserveSize(reserveSize);
     igniteConfiguration.setAtomicConfiguration(atomicCfg);
+    return this;
+  }
+
+  public IgniteConfigurationBuilder addDataStorageConfiguration(Boolean persistenceEnabled, String persistenceStoragePath, Long maxMemorySize) {
+    DataStorageConfiguration storageCfg = new DataStorageConfiguration();
+
+    storageCfg.getDefaultDataRegionConfiguration().setPersistenceEnabled(persistenceEnabled);
+
+    if (!persistenceEnabled) {
+      storageCfg.getDefaultDataRegionConfiguration().setPageEvictionMode(DataPageEvictionMode.RANDOM_LRU);
+      //storageCfg.getDefaultDataRegionConfiguration().setEvictionThreshold(0.5);
+    }
+
+    // uses 20% of RAM available on the local machine by default
+    if (maxMemorySize != null && maxMemorySize > 0) {
+      storageCfg.getDefaultDataRegionConfiguration().setMaxSize(maxMemorySize);
+    }
+
+    // uses work directory by default.
+    if (persistenceStoragePath != null && !persistenceStoragePath.isEmpty()) {
+      storageCfg.setStoragePath(persistenceStoragePath);
+    }
+
+    igniteConfiguration.setDataStorageConfiguration(storageCfg);
+    return this;
+  }
+
+  public IgniteConfigurationBuilder setWorkDirectory(String workDirectory) {
+    if (workDirectory != null && !workDirectory.isEmpty()) {
+      igniteConfiguration.setWorkDirectory(workDirectory);
+    }
     return this;
   }
 
