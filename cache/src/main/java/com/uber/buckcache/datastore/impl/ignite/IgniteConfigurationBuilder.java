@@ -90,7 +90,6 @@ public class IgniteConfigurationBuilder {
 
   public IgniteConfigurationBuilder addDataStorageConfiguration(
           Boolean persistenceEnabled,
-          String persistenceStoragePath,
           String maxMemorySizeString,
           String pageSizeString,
           Integer emptyPagesPoolSize,
@@ -119,11 +118,6 @@ public class IgniteConfigurationBuilder {
     if (pageSizeString != null && !pageSizeString.isEmpty()) {
       long pageSize = parseBytes(pageSizeString);
       storageCfg.setPageSize((int) pageSize);
-    }
-
-    // uses work directory by default.
-    if (persistenceStoragePath != null && !persistenceStoragePath.isEmpty()) {
-      storageCfg.setStoragePath(persistenceStoragePath);
     }
 
     igniteConfiguration.setDataStorageConfiguration(storageCfg);

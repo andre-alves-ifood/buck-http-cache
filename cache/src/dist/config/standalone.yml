@@ -27,7 +27,6 @@ storeProviderConfig:
     atomicSequenceReserveSize: 10000
     workDirectory:
     persistenceEnabled: false
-    persistenceStoragePath:
     maxMemorySize:
     pageSize:
     emptyPagesPoolSize:

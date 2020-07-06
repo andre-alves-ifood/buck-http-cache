@@ -56,7 +56,6 @@ public class IgniteInstance {
             )
             .addDataStorageConfiguration(
                     this.config.getPersistenceEnabled(),
-                    this.config.getPersistenceStoragePath(),
                     this.config.getMaxMemorySize(),
                     this.config.getPageSize(),
                     this.config.getEmptyPagesPoolSize(),

@@ -37,8 +37,6 @@ public class IgniteConfig {
   @Nonnull
   private final Boolean persistenceEnabled;
   @Nullable
-  private final String persistenceStoragePath;
-  @Nullable
   private final String maxMemorySize;
   @Nullable
   private final String pageSize;
@@ -60,7 +58,6 @@ public class IgniteConfig {
       @Nonnull @JsonProperty("dnsLookupAddress") String dnsLookupAddress,
       @Nullable @JsonProperty("workDirectory") String workDirectory,
       @Nonnull @JsonProperty("persistenceEnabled") Boolean persistenceEnabled,
-      @Nullable @JsonProperty("persistenceStoragePath") String persistenceStoragePath,
       @Nullable @JsonProperty("maxMemorySize") String maxMemorySize,
       @Nullable @JsonProperty("pageSize") String pageSize,
       @Nullable @JsonProperty("emptyPagesPoolSize") Integer emptyPagesPoolSize,
@@ -76,7 +73,6 @@ public class IgniteConfig {
     this.dnsLookupAddress = dnsLookupAddress;
     this.workDirectory = workDirectory;
     this.persistenceEnabled = persistenceEnabled;
-    this.persistenceStoragePath = persistenceStoragePath;
     this.maxMemorySize = maxMemorySize;
     this.pageSize = pageSize;
     this.emptyPagesPoolSize = emptyPagesPoolSize;
@@ -136,11 +132,6 @@ public class IgniteConfig {
   @NotNull
   public Boolean getPersistenceEnabled() {
     return persistenceEnabled;
-  }
-
-  @Nullable
-  public String getPersistenceStoragePath() {
-    return persistenceStoragePath;
   }
 
   @Nullable
