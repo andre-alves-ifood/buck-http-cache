@@ -54,6 +54,14 @@ public class IgniteInstance {
                     this.config.getHostIPs(),
                     this.config.getDnsLookupAddress()
             )
+            .addDataStorageConfiguration(
+                    this.config.getPersistenceEnabled(),
+                    this.config.getPersistenceStoragePath(),
+                    this.config.getMaxMemorySize(),
+                    this.config.getPageSize(),
+                    this.config.getEmptyPagesPoolSize(),
+                    this.config.getEvictionThreshold()
+            )
             .addCacheConfiguration(
                     this.config.getCacheMode(),
                     this.config.getCacheBackupCount(),
@@ -65,11 +73,6 @@ public class IgniteInstance {
             )
             .addAtomicSequenceConfig(
                     config.getAtomicSequenceReserveSize()
-            )
-            .addDataStorageConfiguration(
-                    this.config.getPersistenceEnabled(),
-                    this.config.getPersistenceStoragePath(),
-                    this.config.getMaxMemorySize()
             )
             .build();
 

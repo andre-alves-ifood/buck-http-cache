@@ -33,6 +33,9 @@ storeProviderConfig:
     persistenceEnabled: false
     persistenceStoragePath:
     maxMemorySize:
+    pageSize:
+    emptyPagesPoolSize:
+    evictionThreshold:
 
 statsd:
   enabled: false

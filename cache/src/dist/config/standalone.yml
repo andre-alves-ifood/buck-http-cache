@@ -29,6 +29,9 @@ storeProviderConfig:
     persistenceEnabled: false
     persistenceStoragePath:
     maxMemorySize:
+    pageSize:
+    emptyPagesPoolSize:
+    evictionThreshold:
 
 authenticationConfig:
   tokens:

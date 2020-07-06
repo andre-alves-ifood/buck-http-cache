@@ -39,7 +39,13 @@ public class IgniteConfig {
   @Nullable
   private final String persistenceStoragePath;
   @Nullable
-  private final Long maxMemorySize;
+  private final String maxMemorySize;
+  @Nullable
+  private final String pageSize;
+  @Nullable
+  private final Integer emptyPagesPoolSize;
+  @Nullable
+  private final Double evictionThreshold;
 
   @JsonCreator
   public IgniteConfig(
@@ -55,7 +61,10 @@ public class IgniteConfig {
       @Nullable @JsonProperty("workDirectory") String workDirectory,
       @Nonnull @JsonProperty("persistenceEnabled") Boolean persistenceEnabled,
       @Nullable @JsonProperty("persistenceStoragePath") String persistenceStoragePath,
-      @Nullable @JsonProperty("maxMemorySize") Long maxMemorySize) {
+      @Nullable @JsonProperty("maxMemorySize") String maxMemorySize,
+      @Nullable @JsonProperty("pageSize") String pageSize,
+      @Nullable @JsonProperty("emptyPagesPoolSize") Integer emptyPagesPoolSize,
+      @Nullable @JsonProperty("evictionThreshold") Double evictionThreshold) {
     this.multicastIP = multicastIP;
     this.multicastPort = multicastPort;
     this.cacheMode = cacheMode;
@@ -69,6 +78,9 @@ public class IgniteConfig {
     this.persistenceEnabled = persistenceEnabled;
     this.persistenceStoragePath = persistenceStoragePath;
     this.maxMemorySize = maxMemorySize;
+    this.pageSize = pageSize;
+    this.emptyPagesPoolSize = emptyPagesPoolSize;
+    this.evictionThreshold = evictionThreshold;
   }
 
   @NotNull
@@ -132,8 +144,23 @@ public class IgniteConfig {
   }
 
   @Nullable
-  public Long getMaxMemorySize() {
+  public String getMaxMemorySize() {
     return maxMemorySize;
+  }
+
+  @Nullable
+  public String getPageSize() {
+    return pageSize;
+  }
+
+  @Nullable
+  public Integer getEmptyPagesPoolSize() {
+    return emptyPagesPoolSize;
+  }
+
+  @Nullable
+  public Double getEvictionThreshold() {
+    return evictionThreshold;
   }
 
   public String toString() {

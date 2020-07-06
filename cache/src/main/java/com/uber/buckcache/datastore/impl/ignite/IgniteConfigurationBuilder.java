@@ -8,6 +8,7 @@ import javax.cache.expiry.Duration;
 import javax.cache.expiry.TouchedExpiryPolicy;
 
 import com.spotify.dns.DnsSrvResolvers;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.configuration.*;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
@@ -17,6 +18,7 @@ import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 import com.google.common.base.Strings;
 import com.spotify.dns.DnsSrvResolver;
 import com.spotify.dns.LookupResult;
+import com.uber.buckcache.utils.BytesRateLimiter.BIT_UNIT;
 
 public class IgniteConfigurationBuilder {
 
@@ -86,19 +88,37 @@ public class IgniteConfigurationBuilder {
     return this;
   }
 
-  public IgniteConfigurationBuilder addDataStorageConfiguration(Boolean persistenceEnabled, String persistenceStoragePath, Long maxMemorySize) {
+  public IgniteConfigurationBuilder addDataStorageConfiguration(
+          Boolean persistenceEnabled,
+          String persistenceStoragePath,
+          String maxMemorySizeString,
+          String pageSizeString,
+          Integer emptyPagesPoolSize,
+          Double evictionThreshold
+  ) {
     DataStorageConfiguration storageCfg = new DataStorageConfiguration();
 
     storageCfg.getDefaultDataRegionConfiguration().setPersistenceEnabled(persistenceEnabled);
+    storageCfg.getDefaultDataRegionConfiguration().setPageEvictionMode(DataPageEvictionMode.RANDOM_LRU);
 
-    if (!persistenceEnabled) {
-      storageCfg.getDefaultDataRegionConfiguration().setPageEvictionMode(DataPageEvictionMode.RANDOM_LRU);
-      //storageCfg.getDefaultDataRegionConfiguration().setEvictionThreshold(0.5);
+    if (emptyPagesPoolSize != null && emptyPagesPoolSize > 0) {
+      storageCfg.getDefaultDataRegionConfiguration().setEmptyPagesPoolSize(emptyPagesPoolSize);
+    }
+
+    if (evictionThreshold != null && evictionThreshold > 0) {
+      storageCfg.getDefaultDataRegionConfiguration().setEvictionThreshold(evictionThreshold);
     }
 
     // uses 20% of RAM available on the local machine by default
-    if (maxMemorySize != null && maxMemorySize > 0) {
+    if (maxMemorySizeString != null && !maxMemorySizeString.isEmpty()) {
+      long maxMemorySize = parseBytes(maxMemorySizeString);
       storageCfg.getDefaultDataRegionConfiguration().setMaxSize(maxMemorySize);
+    }
+
+    // 4KB by default
+    if (pageSizeString != null && !pageSizeString.isEmpty()) {
+      long pageSize = parseBytes(pageSizeString);
+      storageCfg.setPageSize((int) pageSize);
     }
 
     // uses work directory by default.
@@ -119,6 +139,12 @@ public class IgniteConfigurationBuilder {
 
   public IgniteConfiguration build() {
     return igniteConfiguration;
+  }
+
+  private long parseBytes(String formattedString) {
+    String multiplier = formattedString.substring(0, formattedString.length() - 1);
+    String unit = formattedString.substring(formattedString.length() - 1, formattedString.length());
+    return Long.parseLong(multiplier) * BIT_UNIT.valueOf(StringUtils.lowerCase(unit)).getNumberOfBytes();
   }
 
   private List<String> resolveAddressByDNS(String dnsLookupAddress) {
