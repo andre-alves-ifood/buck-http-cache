@@ -19,11 +19,13 @@ import com.google.common.base.Strings;
 import com.spotify.dns.DnsSrvResolver;
 import com.spotify.dns.LookupResult;
 import com.uber.buckcache.utils.BytesRateLimiter.BIT_UNIT;
+import org.slf4j.Logger;
 
 public class IgniteConfigurationBuilder {
 
   private IgniteConfiguration igniteConfiguration;
   private final DnsSrvResolver dnsResolver;
+  private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IgniteConfigurationBuilder.class);
 
   public IgniteConfigurationBuilder() {
     this(DnsSrvResolvers.newBuilder()
@@ -119,6 +121,16 @@ public class IgniteConfigurationBuilder {
       long pageSize = parseBytes(pageSizeString);
       storageCfg.setPageSize((int) pageSize);
     }
+
+    // need to use big WAL segment size because some artifacts are huge (more than 250mb)
+    //storageCfg.setWalSegmentSize((int) parseBytes("1g"));
+    //storageCfg.setMaxWalArchiveSize(parseBytes("3g"));
+
+    // or disable wal... (need to delete storage between node restarts)
+    storageCfg.setWalMode(WALMode.NONE);
+
+    // Enabling the writes throttling.
+    storageCfg.setWriteThrottlingEnabled(true);
 
     igniteConfiguration.setDataStorageConfiguration(storageCfg);
     return this;
