@@ -21,7 +21,7 @@ storeProviderConfig:
     hostIPs:
     dnsLookupAddress:
     cacheMode: PARTITIONED
-    cacheBackupCount: 1
+    cacheBackupCount: 0
     expirationTimeUnit: DAYS
     expirationTimeValue: 2
     atomicSequenceReserveSize: 10000

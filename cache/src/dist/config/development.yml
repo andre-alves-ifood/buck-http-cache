@@ -21,7 +21,7 @@ storeProviderConfig:
     hostIPs:
       - 127.0.0.1
     cacheMode: PARTITIONED
-    cacheBackupCount: 1
+    cacheBackupCount: 0
     expirationTimeUnit: DAYS
     expirationTimeValue: 7
     atomicSequenceReserveSize: 10000
