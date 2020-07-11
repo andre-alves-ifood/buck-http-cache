@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.cache.configuration.Factory;
 import javax.cache.expiry.Duration;
+import javax.cache.expiry.ExpiryPolicy;
 import javax.cache.expiry.TouchedExpiryPolicy;
 
 import com.spotify.dns.DnsSrvResolvers;
@@ -39,7 +41,12 @@ public class IgniteConfigurationBuilder {
     igniteConfiguration = new IgniteConfiguration();
   }
 
-  public IgniteConfigurationBuilder addMulticastBasedDiscrovery(String multicastIP, Integer multicastPort, List<String> hostIPs, String dnsLookupAddress) {
+  public IgniteConfigurationBuilder addMulticastBasedDiscrovery(
+          String multicastIP,
+          Integer multicastPort,
+          List<String> hostIPs,
+          String dnsLookupAddress
+  ) {
     if (hostIPs == null) {
       hostIPs = new ArrayList<String>();
     }
@@ -72,10 +79,13 @@ public class IgniteConfigurationBuilder {
       CacheConfiguration cacheConfiguration = new CacheConfiguration(caches[i]);
       cacheConfiguration.setCacheMode(cacheMode);
       cacheConfiguration.setStatisticsEnabled(true);
-
       cacheConfiguration.setBackups(backupCount);
-      cacheConfiguration
-          .setExpiryPolicyFactory(TouchedExpiryPolicy.factoryOf(new Duration(expirationTimeUnit, expirationTimeValue)));
+
+      Duration expirationTime = new Duration(expirationTimeUnit, expirationTimeValue);
+      Factory<ExpiryPolicy> expirePolicy = TouchedExpiryPolicy.factoryOf(expirationTime);
+      cacheConfiguration.setExpiryPolicyFactory(expirePolicy);
+      cacheConfiguration.setEagerTtl(true);
+
       cacheConfigs[i] = cacheConfiguration;
     }
     
