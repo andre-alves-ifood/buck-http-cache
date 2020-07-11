@@ -23,14 +23,14 @@ storeProviderConfig:
     cacheMode: PARTITIONED
     cacheBackupCount: 0
     expirationTimeUnit: DAYS
-    expirationTimeValue: 2
+    expirationTimeValue: 7
     atomicSequenceReserveSize: 10000
     workDirectory:
-    persistenceEnabled: false
-    maxMemorySize:
-    pageSize:
-    emptyPagesPoolSize:
-    evictionThreshold:
+    persistenceEnabled: true
+    maxMemorySize: 36g
+    pageSize: 16k
+    emptyPagesPoolSize: 12800 # for 200mb max artifact
+    evictionThreshold: 0.9
 
 authenticationConfig:
   tokens:
