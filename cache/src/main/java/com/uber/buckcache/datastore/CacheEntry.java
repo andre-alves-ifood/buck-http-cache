@@ -2,8 +2,6 @@ package com.uber.buckcache.datastore;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 /**
  * An entry in the build cache.
  */
@@ -22,12 +20,7 @@ public class CacheEntry {
     return buckData;
   }
 
-  public void setBuckData(byte[] buckData) {
-    this.buckData = buckData;
-  }
-
   public int getBytes() {
     return bytes;
   }
-
 }

@@ -62,6 +62,7 @@ public class BuckCacheResource {
   private static final Logger logger = LoggerFactory.getLogger(BuckCacheResource.class);
   private static final String X_CACHE_EXPIRY_SECONDS = "X-Cache-Expiry-Seconds";
   private static final String X_CACHE_TAGS = "X-Cache-Tags";
+  private static final String X_CACHE_LABEL = "X-Cache-Label";
 
   private final DataStoreProvider storeProvider;
   private final BytesRateLimiter rateLimiter;
@@ -71,11 +72,18 @@ public class BuckCacheResource {
     this.storeProvider = storeProvider;
   }
 
-  private static String getCacheKeyWithCustomizedParam(String key, String cacheTags) {
-    if (StringUtils.isEmpty(cacheTags)) {
+  private static String getCacheKeyWithCustomizedParam(String key, String params) {
+    if (StringUtils.isEmpty(params)) {
       return key;
     }
-    return String.format("%s.%s", key, cacheTags);
+    return String.format("%s.%s", key, params);
+  }
+
+  private static void updatePutCacheEntryWithLabel(PutCacheEntry cacheEntry, String cacheLabel) {
+    String[] cacheKeys = cacheEntry.getKeys();
+    for (int i = 0; i < cacheKeys.length; i++) {
+      cacheKeys[i] = getCacheKeyWithCustomizedParam(cacheKeys[i], cacheLabel);
+    }
   }
 
   @GET
@@ -91,29 +99,33 @@ public class BuckCacheResource {
   @Path("key/{key}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response getCacheArtifact(@PathParam("key") String key,
-                                   @HeaderParam(X_CACHE_TAGS) String cacheTags) throws Exception {
+                                   @HeaderParam(X_CACHE_TAGS) String cacheTags,
+                                   @HeaderParam(X_CACHE_LABEL) String cacheLabel) throws Exception {
     StatsDClient.get().count(getCacheKeyWithCustomizedParam(GET_CALL_COUNT, cacheTags), 1L);
+    String cacheKey = getCacheKeyWithCustomizedParam(key, cacheLabel);
     CacheEntry cacheEntry;
     long start = System.currentTimeMillis();
 
     try {
-      cacheEntry = storeProvider.getData(key);
+      cacheEntry = storeProvider.getData(cacheKey);
       // TODO: need to kill the requests rather than queue here
       rateLimiter.checkout(cacheEntry.getBytes());
 
       StatsDClient.get().count(OUTGOING_BYTES_TOTAL_COUNT, cacheEntry.getBytes());
       StatsDClient.get().recordExecutionTime(OUTGOING_BYTES_PER_REQUEST, cacheEntry.getBytes());
+
     } catch (DatastoreUnavailableException ex) {
       StatsDClient.get().recordExecutionTimeToNow(GET_CALL_TIME, start);
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+
     } catch (EntryNotFoundException ex) {
-      logger.debug("Cache MISS", key);
+      logger.debug("Cache MISS", cacheKey);
       StatsDClient.get().count(getCacheKeyWithCustomizedParam(CACHE_MISS_COUNT, cacheTags), 1L);
       StatsDClient.get().recordExecutionTimeToNow(GET_CALL_TIME, start);
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    logger.debug("Cache hit", key);
+    logger.debug("Cache hit", cacheKey);
     StatsDClient.get().count(getCacheKeyWithCustomizedParam(CACHE_HIT_COUNT, cacheTags), 1L);
     StatsDClient.get().recordExecutionTimeToNow(GET_CALL_TIME, start);
     return Response.ok(cacheEntry).build();
@@ -124,7 +136,8 @@ public class BuckCacheResource {
   @Path("key")
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   public Response addArtifactToCache(PutCacheEntry putCacheEntry,
-                                     @HeaderParam(X_CACHE_EXPIRY_SECONDS) String cacheExpirySeconds) throws Exception {
+                                     @HeaderParam(X_CACHE_EXPIRY_SECONDS) String cacheExpirySeconds,
+                                     @HeaderParam(X_CACHE_LABEL) String cacheLabel) throws Exception {
     StatsDClient.get().count(PUT_CALL_COUNT, 1L);
 
     long start = System.currentTimeMillis();
@@ -132,6 +145,8 @@ public class BuckCacheResource {
       try {
         // TODO: need to kill the requests rather than queue here
         rateLimiter.checkout(putCacheEntry.getBytes());
+
+        updatePutCacheEntryWithLabel(putCacheEntry, cacheLabel);
 
         if (!StringUtils.isEmpty(cacheExpirySeconds)) {
           try {
@@ -148,7 +163,6 @@ public class BuckCacheResource {
         }
 
         StatsDClient.get().recordExecutionTimeToNow(PUT_CALL_TIME, start);
-
         StatsDClient.get().count(INCOMING_BYTES_TOTAL_COUNT, putCacheEntry.getBytes());
         StatsDClient.get().recordExecutionTime(INCOMING_BYTES_PER_REQUEST, putCacheEntry.getBytes());
 
