@@ -139,9 +139,6 @@ public class IgniteConfigurationBuilder {
     // or disable wal... (need to delete storage between node restarts)
     storageCfg.setWalMode(WALMode.NONE);
 
-    // Enabling the writes throttling.
-    storageCfg.setWriteThrottlingEnabled(true);
-
     igniteConfiguration.setDataStorageConfiguration(storageCfg);
     return this;
   }
