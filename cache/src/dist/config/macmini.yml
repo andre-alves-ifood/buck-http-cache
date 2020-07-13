@@ -10,7 +10,7 @@ mode: DUAL
 
 # per instance, per second payload throttle limit
 # available units, b,k,m & g
-throttleLimit: 500m
+throttleLimit: 1g
 
 storeProviderKlass: com.uber.buckcache.datastore.impl.ignite.IgniteDataStoreProvider
 
