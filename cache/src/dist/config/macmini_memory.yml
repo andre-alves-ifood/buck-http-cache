@@ -30,7 +30,7 @@ storeProviderConfig:
     maxMemorySize: 46g
     pageSize: 16k
     emptyPagesPoolSize: 12800 # for 200mb max artifact
-    evictionThreshold: 0.9
+    evictionThreshold: 0.95
 
 authenticationConfig:
   tokens:
